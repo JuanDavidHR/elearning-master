@@ -60,7 +60,7 @@ class MedicamentoController extends Controller
     }
     public function selectMedicamento(Request $request)
     {
-        //if (!$request->ajax()) return redirect('/');
+        if (!$request->ajax()) return redirect('/');
         $medicamento =Medicamento::where('vigencia','=',1)
         ->select('id','nombre')->orderBy('nombre','asc')->get();
 

@@ -66,4 +66,12 @@ class BoticaController extends Controller
             return response()->json(['error' => $ex->getMessage()], 500);
         }
     }
+    public function selectBotica(Request $request)
+    {
+        if (!$request->ajax()) return redirect('/');
+        $botica =Botica::where('vigencia','=',1)
+        ->select('id','nombre')->orderBy('nombre','asc')->get();
+        return ['botica'=>$botica];
+    }
+
 }

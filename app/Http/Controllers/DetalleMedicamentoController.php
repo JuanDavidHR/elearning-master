@@ -26,7 +26,7 @@ class DetalleMedicamentoController extends Controller
                 'last_page'         => $detalle_medicamentos->lastPage(),
                 'from'              => $detalle_medicamentos->firstItem(),
                 'to'                => $detalle_medicamentos->lastItem(),
-            ], 'det$detalle_medicamentos' => $detalle_medicamentos
+            ], 'detalle_medicamentos' => $detalle_medicamentos
         ];
     }
     

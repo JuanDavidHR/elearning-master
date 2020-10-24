@@ -54,4 +54,11 @@ class LaboratorioController extends Controller
             return response()->json(['error' => $ex->getMessage()], 500);
         }
     }
+    public function selectLaboratorio(Request $request)
+    {
+        //if (!$request->ajax()) return redirect('/');
+        $laboratorio =Laboratorio::where('vigencia','=',1)
+        ->select('id','nombre')->orderBy('nombre','asc')->get();
+        return ['laboratorio'=>$laboratorio];
+    }
 }

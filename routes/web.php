@@ -83,6 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/Laboratorio', 'LaboratorioController@index');
         Route::post('/Laboratorio/store', 'LaboratorioController@store');
         Route::put('/Laboratorio/update', 'LaboratorioController@update');
+        Route::get('/Laboratorio/selectLaboratorio', 'LaboratorioController@selectLaboratorio');
  
         Route::get('/TipoMedicamento', 'TipoMedicamentoController@index');
         Route::post('/TipoMedicamento/store', 'TipoMedicamentoController@store');
@@ -102,6 +103,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/Botica', 'BoticaController@index');
         Route::post('/Botica/store', 'BoticaController@store');
         Route::put('/Botica/update', 'BoticaController@update');
+        Route::get('/Botica/selectBotica', 'BoticaController@selectBotica');
 
         Route::get('/DetallePresentacion', 'DetallePresentacionController@index');
         Route::post('/DetallePresentacion/store', 'DetallePresentacionController@store');

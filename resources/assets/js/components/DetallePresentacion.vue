@@ -267,7 +267,7 @@ export default {
             })
         },
         cerrarModal(){
-            $('#modalDetalleMedicamento').modal('hide');
+            $('#modalDetallePresentacion').modal('hide');
         },
         initial(){
             this.errors = [];
