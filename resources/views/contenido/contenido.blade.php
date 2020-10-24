@@ -25,6 +25,9 @@
             <template v-if="menu==1005">
                 <detallepresentacion/>
             </template>
+            <template v-if="menu==1006">
+                <detallemedicamento/>
+            </template>
             <template v-if="menu==200">
                 <curso></curso>
             </template>

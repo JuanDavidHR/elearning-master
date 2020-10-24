@@ -107,6 +107,10 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/DetallePresentacion/store', 'DetallePresentacionController@store');
         Route::put('/DetallePresentacion/update', 'DetallePresentacionController@update');
 
+        Route::get('/DetalleMedicamento', 'DetalleMedicamentoController@index');
+        Route::post('/DetalleMedicamento/store', 'DetalleMedicamentoController@store');
+        Route::put('/DetalleMedicamento/update', 'DetalleMedicamentoController@update');
+
         Route::get('/Lugar', 'LugarController@index');
         Route::post('/Lugar/store', 'LugarController@store');
         Route::put('/Lugar/update', 'LugarController@update');

@@ -93,6 +93,7 @@
                         </li>
                     </ul>
                 </li>
+                
                 <li class=" nav-item">
                     <a>
                         <i class="feather icon-home"></i>
@@ -106,6 +107,24 @@
                                 <i class="feather icon-circle"></i>
                                 <span class="menu-item" data-i18n="Shop">
                                     Gestionar Boticas
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class=" nav-item">
+                    <a>
+                        <i class="feather icon-home"></i>
+                        <span class="menu-title" data-i18n="Ecommerce">
+                            Detalle Medicamento
+                        </span>
+                    </a>
+                    <ul class="menu-content">
+                        <li @click="menu=1006">
+                            <a>
+                                <i class="feather icon-circle"></i>
+                                <span class="menu-item" data-i18n="Shop">
+                                    Mantenimiento Medicamento
                                 </span>
                             </a>
                         </li>

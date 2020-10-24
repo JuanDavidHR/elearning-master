@@ -9,7 +9,7 @@ class DetalleMedicamento extends Model
     protected $table = 'detalla_medicamento';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'id', 'codigo' ,'vigencia','idMedicamento','idPresentacion','idTipo','idBotica','idLaboratorio'
+        'id', 'codigo' ,'vigencia','precio','registroSanitario','idMedicamento','idPresentacion','idTipo','idBotica','idLaboratorio'
     ];
     public $timestamps = false;
 }

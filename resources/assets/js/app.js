@@ -50,6 +50,7 @@ Vue.component("presentacion", require("./components/Presentacion.vue").default);
 Vue.component("medicamento", require("./components/Medicamento.vue").default);
 Vue.component("botica", require("./components/Botica.vue").default);
 Vue.component("detallepresentacion", require("./components/DetallePresentacion.vue").default)
+Vue.component("detallemedicamento", require("./components/DetalleMedicamento.vue").default)
 //--------------------------
 Vue.component(
     "categoriamuni",
