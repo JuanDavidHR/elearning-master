@@ -1,0 +1,766 @@
+
+<template>
+    <main class="main">
+        <div class="container-fluid mt-4">
+            <div class="card mb-4">
+                <template v-if="se_muestra">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-4 btn1">
+                                <h6 class="mt-1">Listado de control de viáticos.</h6>
+                            </div>
+                            <div class="col-md-4 btn1">
+                                <div class="input-group">
+                                    <input type="text" @keyup.enter="listarEgreso(1, buscar, mes, anho)" v-model="buscar" class="form-control document-nice" placeholder="Documento a buscar">
+                                    <button type="submit" @click.prevent="listarEgreso(1, buscar, mes, anho)" class="btn btn-primary btn-border"><i class="fa fa-search"></i> Buscar</button>
+                                </div>
+                            </div>    
+                            <div class="col-md-4 btn1">
+                                <date-picker v-model="mesBuscar" type="month" value-type="date" format="MM-Y" @change="validateMes()" placeholder="Seleccionar mes"></date-picker>
+                            </div>    
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <template v-if="arrayViatico.length">
+                                <div class="col-md-6 mb-2" v-for="viatico in arrayViatico" :key="viatico.idViatico">
+                                    <div class="card">
+                                        <div class="card-header" v-bind:class="{'vigente' : calcul(viatico.fecha_maximo) >= 0, 'pasado': calcul(viatico.fecha_maximo) < 0}">
+                                            <div class="row">
+                                                <div class="col-md-12 d-flex">
+                                                    <template v-if="calcul(viatico.fecha_maximo) >= 0">
+                                                        <div class="noneBottom">
+                                                            Días faltantes: <span>{{calcul(viatico.fecha_maximo)}}</span>
+                                                        </div>
+                                                    </template>
+                                                    <template v-else>
+                                                        <div class="noneBottom">
+                                                            Días excedentes: <span>{{calcul(viatico.fecha_maximo)}}</span>
+                                                        </div>
+                                                    </template>
+                                                    <div class="btn-group ml-auto " role="group">
+                                                        <button type="button" class="btn btns btn-info btn-sm" @click="imprimir(viatico)">
+                                                            <i class="fa fa-print"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group">
+                                                <span class="estilo">Tipo de actividad:</span> {{viatico.tipo_actividad}}<br>
+                                                <span class="estilo">Documento de solicitud:</span> {{viatico.documento_solicitud}}<br>
+                                                <span class="estilo">Fecha de solicitud:</span> {{usemoment(viatico.fecha_solicitud)}}<br>
+                                                <span class="estilo">Documento de autorización:</span> {{viatico.documento_autorizacion}}<br>
+                                                <span class="estilo">Fecha de autorización:</span> {{usemoment(viatico.fecha_autorizacion)}}<br>
+                                                <span class="estilo">Nombre de responsable:</span> {{viatico.nombre_responsable}}<br>
+                                                <span class="estilo">Monto:</span> {{convert(viatico.monto_viatico)}}<br>
+                                                <span class="estilo">Fecha de inicio:</span> {{usemoment(viatico.fecha_inicio)}}<br>
+                                                <span class="estilo">Fecha de fin:</span> {{usemoment(viatico.fecha_final)}}<br>
+                                                <span class="estilo">Fecha máxima de rendición:</span> {{usemoment(viatico.fecha_maximo)}}
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <template v-else>
+                                <div class="col-md-12">
+                                    <template v-if="cargando">
+                                        <div>
+                                            Cargando....
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="alert alert-danger" role="alert">
+                                            No hay resultados
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        <nav>
+                            <ul class="pagination mb-0">
+                                <li class="page-item" v-if="pagination.current_page > 1">
+                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page - 1)">Ant</a>
+                                </li>
+                                <li class="page-item" v-for="page in pagesNumber" :key="page" :class="[page == isActived ? 'active' : '']" >
+                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(page)" v-text="page"></a>
+                                </li>
+                                <li class="page-item" v-if="pagination.current_page < pagination.last_page">
+                                    <a class="page-link" href="#" @click.prevent="cambiarPagina(pagination.current_page + 1)">Sig</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="card-header" style="background-color:#fff!important;">
+                        <div class="row justify-content-center mt-1 mb-3">
+                            <h4 style="text-decoration:underline; font-weight: bold;">Control de los Viáticos</h4>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-3 col-sm-6">
+                                <a href="#" class="btn btn-primary btn-xs aux" @click="interior()" style="margin-bottom:4px; word-wrap:break-word;">COMISIÓN DE SERVICIOS AL INTERIOR DEL PAÍS</a>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <a href="#" class="btn btn-primary btn-xs aux" @click="exterior()" style="margin-bottom:4px; word-wrap:break-word;">COMISIÓN DE SERVICIOS AL EXTERIOR DEL PAÍS</a>
+                            </div>
+                            <div class="col-md-3 mt-1 ml-auto">
+                                <h5>Fecha: {{obtenerHora}}</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row justify-content-center mt-1 mb-3">
+                            <div>
+                                <h6 style="text-decoration:underline; font-weight: bold;">{{tipo_actividad}}</h6>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="" class="col-form-label">Documento de Solicitud</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" v-model="documento_solicitud" class="form-control">
+                                    <small v-if="errors.documento_solicitud" class="text-danger" v-text="errors.documento_solicitud[0]"></small>
+                                </div>
+                                <div class="col-md-1">
+                                    <label for="" class="col-form-label">Fecha</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <date-picker v-model="fechaSolicitud" :disabled-date="disableWeekends" value-type="format" :clearable = "false" format="DD-MM-YYYY"></date-picker>
+                                    <small v-if="errors.fecha_solicitud" class="text-danger" v-text="errors.fecha_solicitud[0]"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="" class="col-form-label">Documento de Autorización</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" v-model="documento_autorizacion">
+                                    <small v-if="errors.documento_autorizacion" class="text-danger" v-text="errors.documento_autorizacion[0]"></small>
+                                </div>
+                                <div class="col-md-1">
+                                    <label for="" class="col-form-label">Fecha</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <date-picker v-model="fechaAutorizacion" :disabled-date="disableWeekends" value-type="format" :clearable = "false" format="DD-MM-YYYY"></date-picker>
+                                    <small v-if="errors.fecha_autorizacion" class="text-danger" v-text="errors.fecha_autorizacion[0]"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="" class="col-form-label">Nombre del responsable de los viáticos</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" v-model="nombre_responsable">
+                                    <small v-if="errors.nombre_responsable" class="text-danger" v-text="errors.nombre_responsable[0]"></small>
+                                </div>
+                                <div class="col-md-1">
+                                    <label for="" class="col-form-label">Área</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <v-select label="nombre" @input="cambioEstado" :options="arrayArea" v-model="area" style="width:100% !important;" >
+                                        <span  slot = "no-options" >No se encontró el área.</span>
+                                    </v-select>   
+                                    <small v-if="errors.idArea" class="text-danger" v-text="errors.idArea[0]"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="" class="col-form-label">Monto</label>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" step="0.01" min="0" value="0" max="99999999.99" pattern="^\d*(\.\d{0,2})?$" v-model="monto_viatico" class="form-control">
+                                    <small v-if="errors.monto_viatico" class="text-danger" v-text="errors.monto_viatico[0]"></small>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="form-group mt-4">
+                            <div class="row">
+                                <div class="col-md-3 mt-2 mb-2">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Fecha de Inicio de Actividades
+                                        </div>
+                                        <div class="card-body">
+                                            <date-picker v-model="fechaInicio" :disabled-date="disableYear" :clearable = "false" value-type="format" format="DD-MM-YYYY"></date-picker>
+                                            <small v-if="errors.fecha_inicio" class="text-danger" v-text="errors.fecha_inicio[0]"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mt-2 mb-2">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Fecha Final de Actividades
+                                        </div>
+                                        <div class="card-body">
+                                            <date-picker v-model="fechaFinal" @pick="propp" :disabled-date="disableYear" readonly :clearable = "false" value-type="format" format="DD-MM-YYYY"></date-picker>
+                                            <small v-if="errors.fecha_final" class="text-danger" v-text="errors.fecha_final[0]"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mt-2 mb-2">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            Plazo máximo de rendición*
+                                        </div>
+                                        <div class="card-body">
+                                            <date-picker v-model="fechaMaximo" :disabled-date="disableWeekends" :disabled = "true" :clearable = "false" value-type="format" format="DD-MM-YYYY"></date-picker>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mt-2 mb-2">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <template v-if="cambia">
+                                                <label for="">Días Faltantes</label>
+                                            </template>
+                                            <template v-else>
+                                                <div>
+                                                    <label for="">Días Excedentes</label>
+                                                </div>
+                                            </template>
+                                            <div style="display:none;">
+                                                {{dias}}
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <input type="text" class="form-control" style="background:#FFF8E1;" v-model="resta" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="card-body border" style="background:#ffcdd2;">
+                                        <p class="mb-0">{{texto1}}
+                                        </p>
+                                        <p><span style="font-weight:bold !important;font-style:italic !important;">{{texto2}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer mb-0">
+                            <button type="button" class="btn regresar btns text-white btn-secondary ml-auto" @click="se_muestra = true,scrollBehavior">Regresar</button>
+                            <button v-if="tipoAccion == 1" class="btn nuevo btn-success" @click="registrarEncargo();">Registrar Viatico</button>
+                            <button v-if="tipoAccion == 2" class="btn nuevo btn-success" @click="actualizarEncargo();">Actualizar Viatico</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>             
+    </main>
+</template>
+<script>
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    import DatePicker from 'vue2-datepicker'
+    import 'vue2-datepicker/index.css';
+    import 'vue2-datepicker/locale/es';
+    import vSelect from 'vue-select';
+    import moment from 'moment';
+    export default {
+        components:{
+            DatePicker,
+            vSelect
+        },
+        data() {
+            return {
+                mes : '',
+                anho : '',
+                idViatico : 0,
+                cargando : true,
+                buscar : '',
+                mesBuscar : '',
+                arrayViatico : [],
+                documento_autorizacion : '',
+                documento_solicitud : '',
+                nombre_responsable : '',
+                monto_viatico : 0,
+                area : '',
+                fechaSolicitud : '',
+                fechaAutorizacion : '',
+                fechaInicio : '',
+                fechaFinal : '',
+                fechaMaximo : '',
+                tipo_actividad : '',
+                texto1 : '',
+                texto2 : '',
+                validar : '',
+                arrayArea : [],
+                errors:{},
+                resta: '', 
+                maximo : '', 
+                fecha : '',
+                contador : 0, 
+                idArea : 0,
+                cambia : true,
+                descontar : 0,
+                se_muestra : true,
+                tipoAccion : 1,
+                pagination : {
+                    'total'          : 0,
+                    'current_page'   : 0,
+                    'per_page'       : 0,
+                    'last_page'      : 0,
+                    'from'           : 0, //desde la página
+                    'to'             : 0, //hasta la página
+                },
+                offset : 3
+            }
+        },
+        computed:{
+            isActived: function(){
+                return this.pagination.current_page;
+            },
+            pagesNumber: function(){
+                if(!this.pagination.to){
+                    return [];
+                }
+                var from = this.pagination.current_page - this.offset;
+                if(from < 1){
+                    from = 1;
+                }
+                var to = from + (this.offset * 2);
+                if(to >= this.pagination.last_page){
+                    to= this.pagination.last_page;
+                }
+                var pagesArrays = [];
+                while(from <= to){
+                    pagesArrays.push(from);
+                    from++;          
+                }
+                return pagesArrays;
+            },
+            obtenerHora(){
+                return  moment().format('DD-MM-YYYY');
+            },
+            dias(){
+                if(this.fechaFinal!= '' && this.fechaMaximo != ''){
+                    var aux = moment().format('DD-MM-YYYY');
+                    this.resta = moment((this.fechaMaximo.split("-").reverse().join("-"))).diff(moment((aux).split("-").reverse().join("-")), 'days');
+                    var mayor, menor, contador = 1, restar = 0;
+                        if(this.resta > 0){
+                            mayor = this.fechaMaximo;
+                            menor = aux;
+                            contador = 1;
+                        }else{
+                            mayor = aux;
+                            menor = this.fechaMaximo;
+                            contador = 0;
+                        }
+                        var recorre = moment((mayor.split("-").reverse().join("-"))).diff(moment((menor).split("-").reverse().join("-")), 'days');
+                        while(contador<=recorre){
+                            var nombre_semana = moment(menor, "DD-MM-YYYY").add(contador, 'days').format("DD-MM-YYYY");
+                            var semana = moment(nombre_semana, "DD-MM-YYYY").isoWeekday()
+                            var day = moment(nombre_semana, "DD-MM-YYYY").date();
+                            var mot = moment(nombre_semana, "DD-MM-YYYY").month();
+                            if((day == 1 && mot == 0 || day == 9 && mot == 3 || day == 10 && mot == 3|| day == 1 && mot == 4|| 
+                                day == 29 && mot == 5|| day == 27 && mot == 6|| day == 28 && mot == 6|| day == 29 && mot == 6||
+                                day == 30 && mot == 7 || day == 8 && mot == 9|| day == 9 && mot == 9 || day == 1 && mot == 10 || 
+                                day == 8 && mot == 11 || day == 25 && mot ==11 || day == 31 && mot ==11)||(semana == 6 || semana ==7)){
+                                restar ++;
+                            }
+                            contador ++;
+                        }
+                    if(this.resta < 0){
+                        this.cambia = false;
+                        this.resta = this.resta + restar;
+                        return this.resta;
+                    }else{
+                        this.resta = this.resta -restar;
+                        this.cambia = true;
+                        return this.resta;
+                    }
+                }else{
+                    this.resta = '';
+                    this.cambia = true;
+                    return this.resta;
+                }
+            },
+        },
+        methods: {
+            convert(number){
+                let val = (number/1).toFixed(2).replace(',', '.');
+                return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            },
+            llenarFormulario(data){
+                this.tipoAccion = 2;
+                this.idViatico = data['idViatico'];
+                this.documento_autorizacion = data['documento_autorizacion'];
+                this.documento_solicitud = data['documento_solicitud'];
+                this.fechaSolicitud = this.usemoment(data['fecha_solicitud']);
+                this.fechaAutorizacion = this.usemoment(data['fecha_autorizacion']);
+                this.nombre_responsable = data['nombre_responsable'];
+                this.idArea = data['idArea'];
+                this.area = data['nombreArea'];
+                if('COMISIÓN DE SERVICIOS AL INTERIOR DEL PAÍS' == data['tipo_actividad']){
+                    this.tipo_actividad = 'COMISIÓN DE SERVICIOS AL INTERIOR DEL PAÍS';
+                    this.texto1 ='Para la comisión de servicios desarrollada al interior del país, la rendición de cuentas no debe exceder los 8 días hábiles después de concluida. Ante el incumplimiento de la rendición o devolución de viáticos no utilizados en el referido plazo, el perceptor de los mismos debe autorizar a la Municipalidad efectúe la retención correspondiente en la Planilla Única de Pagos.';
+                    this.texto2 = '(Art. 68° de la Directiva n.° 001-2007-EF/77.15 Directiva de Tesorería, aprobada el 24 de enero de 2007 vigente desde el 25 de enero de 2007 a la actualidad)';
+                    this.maximo = 8;
+                }else{
+                    this.tipo_actividad ='COMISIÓN DE SERVICIOS AL EXTERIOR DEL PAÍS';
+                    this.texto1 = 'Para la comisión de servicios desarrollada al exterior del país, la rendición de cuentas no debe exceder los 15 días hábiles después de concluida. Ante el incumplimiento de la rendición o devolución de viáticos no utilizados en el referido plazo, el perceptor de los mismos debe autorizar a la Municipalidad efectúe la retención correspondiente en la Planilla Única de Pagos.'
+                    this.texto2 = '(Art. 68° de la Directiva n.° 001-2007-EF/77.15 Directiva de Tesorería, aprobada el 24 de enero de 2007 vigente desde el 25 de enero de 2007 a la actualidad)';
+                    this.maximo = 15;
+                }
+                this.fechaInicio = this.usemoment(data['fecha_inicio']);
+                this.fechaFinal = this.usemoment(data['fecha_final']);
+                this.monto_viatico = data['monto_viatico'];
+                this.fechaMaximo = this.usemoment(data['fecha_maximo']);
+                this.se_muestra = false;
+            },
+            validateMes(){
+                if(!this.mesBuscar){
+                    this.mesBuscar = '';
+                    this.mes = '';
+                    this.anho = '';
+                }else{
+                    this.mes = new Date(this.mesBuscar).getMonth() + 1;
+                    this.anho = new Date(this.mesBuscar).getFullYear();
+                }
+                this.listarEgreso(1, this.buscar, this.mes, this.anho)
+            },
+            imprimir(data){
+                var arreglo = new Array();  
+                var compara = 0;
+                var money = ''
+                money = this.convert(data['monto_viatico']);
+                var titulo = '';
+                compara = this.calcul(data['fecha_maximo']);
+                if(compara >=0){
+                    titulo = 'Días faltantes: ' + compara;
+                }else{
+                    titulo = 'Días excedentes: ' + compara;
+                }
+                window.open('http://muni.pibea.org/Viatico/printf/'+'RGDUQc7pPdWVPKGekpIHMOKG7fwFcO8H+JMs92yylpAypUPtIOznlxtfIayb9811D5EQ43fCvInBjV5yPU9g=='+'/'+data['idViatico']+'/RGDUQc7pPdWVPKGekpIHMOKG7fwFcO8H+JMs92yylpAypUPtIOznlxtfIayb9811D5EQ43fCvInBjV5yPU9g=='+ '/' + titulo +'/' + money +'/RGDUQc7pPdWVPKGekpIHMOKG7fwFcO8H+JMs92yylpAypUPtIOznlxtfIayb9811D5EQ43fCvInBjV5yPU9g==');
+            },
+            nuevoEncargo(){
+                this.tipoAccion = 1;
+                this.se_muestra = false;
+                this.interior();
+                this.limpiar();
+            },
+            cambiarPagina(page){
+                let me = this;
+                me.pagination.current_page = page;
+                me.listarEgreso(page, me.buscar, me.mes, me.anho)
+            },
+            propp(date){
+                if(this.fechaFinal){
+                    this.contador = 0;
+                    var aux = moment(date).format('DD-MM-YYYY');
+                    var sum = date;
+                    while(this.contador != this.maximo){
+                        aux = moment(aux, "DD-MM-YYYY").add(1, 'days').format("DD-MM-YYYY");
+                        const dia = new Date(sum).getDay();
+                        const day = new Date(sum.setDate(sum.getDate()+1)).getDate();
+                        const mot = new Date(sum).getMonth(); 
+                        if((day == 1 && mot == 0 || day == 9 && mot == 3 || day == 10 && mot == 3|| day == 1 && mot == 4|| 
+                day == 29 && mot == 5|| day == 27 && mot == 6|| day == 28 && mot == 6|| day == 29 && mot == 6||
+                 day == 30 && mot == 7 || day == 8 && mot == 9|| day == 9 && mot == 9 || day == 1 && mot == 10 || 
+                 day == 8 && mot == 11 || day == 25 && mot ==11 || day == 31 && mot ==11) || (dia==6 || dia==5)){
+                        }else{
+                            this.contador ++;
+                        }
+                        if(this.contador == this.maximo){
+                            this.fechaMaximo = moment(sum).format('DD-MM-YYYY');
+                        }
+                    }
+                }
+            },
+            calcul:function (fechaMaximo){
+                var aux = moment().format('DD-MM-YYYY');
+                fechaMaximo = moment(fechaMaximo).format('DD-MM-YYYY');
+                var resta = moment((fechaMaximo.split("-").reverse().join("-"))).diff(moment((aux).split("-").reverse().join("-")), 'days');
+                var mayor, menor, contador = 1, restar = 0;
+                if(resta > 0){
+                    mayor = fechaMaximo;
+                    menor = aux;
+                    contador = 1;
+                }else{
+                    mayor = aux;
+                    menor = fechaMaximo;
+                    contador = 0;
+                }
+                var recorre = moment((mayor.split("-").reverse().join("-"))).diff(moment((menor).split("-").reverse().join("-")), 'days');
+                while(contador<=recorre){
+                    var nombre_semana = moment(menor, "DD-MM-YYYY").add(contador, 'days').format("DD-MM-YYYY");
+                    var semana = moment(nombre_semana, "DD-MM-YYYY").isoWeekday()
+                    var day = moment(nombre_semana, "DD-MM-YYYY").date();
+                    var mot = moment(nombre_semana, "DD-MM-YYYY").month();
+                    if((day == 1 && mot == 0 || day == 9 && mot == 3 || day == 10 && mot == 3|| day == 1 && mot == 4|| 
+                        day == 29 && mot == 5|| day == 27 && mot == 6|| day == 28 && mot == 6|| day == 29 && mot == 6||
+                        day == 30 && mot == 7 || day == 8 && mot == 9|| day == 9 && mot == 9 || day == 1 && mot == 10 || 
+                        day == 8 && mot == 11 || day == 25 && mot ==11 || day == 31 && mot ==11)||(semana == 6 || semana ==7)){
+                        restar ++;
+                    }
+                    contador ++;
+                }
+                if(resta < 0){
+                    resta = resta + restar;
+                    return resta;
+                }else{
+                    resta = resta -restar;
+                    return resta;
+                }
+            },
+            disableYear(date){
+                const year = new Date(date).getFullYear(); (year>2040 || year <2020)
+                return(year>2040 || year <2020);
+            },
+            disableWeekends(date) {
+                const dia = new Date(date).getDay();
+                const day = new Date(date).getDate();
+                const mot = new Date(date).getMonth();
+                const year = new Date(date).getFullYear(); (year>2040 || year <2020)
+                return (day == 1 && mot == 0 || day == 9 && mot == 3 || day == 10 && mot == 3|| day == 1 && mot == 4|| 
+                day == 29 && mot == 5|| day == 27 && mot == 6|| day == 28 && mot == 6|| day == 29 && mot == 6||
+                 day == 30 && mot == 7 || day == 8 && mot == 9|| day == 9 && mot == 9 || day == 1 && mot == 10 || 
+                 day == 8 && mot == 11 || day == 25 && mot ==11 || day == 31 && mot ==11) || (dia==0 || dia==6) || (year>2040 || year <2020) ;
+            },
+            notBeforeToday(date) {
+                return date.noWeekends;
+            },
+            notAfterToday(date) {
+                return date > today;
+            },
+            interior(){
+                this.tipo_actividad = 'COMISIÓN DE SERVICIOS AL INTERIOR DEL PAÍS';
+                this.texto1 ='Para la comisión de servicios desarrollada al interior del país, la rendición de cuentas no debe exceder los 8 días hábiles después de concluida. Ante el incumplimiento de la rendición o devolución de viáticos no utilizados en el referido plazo, el perceptor de los mismos debe autorizar a la Municipalidad efectúe la retención correspondiente en la Planilla Única de Pagos.';
+                this.texto2 = '(Art. 68° de la Directiva n.° 001-2007-EF/77.15 Directiva de Tesorería, aprobada el 24 de enero de 2007 vigente desde el 25 de enero de 2007 a la actualidad)';
+                this.maximo = 8;
+                this.fechaFinal = '';
+                this.fechaMaximo = '';
+                this.contador = 0;
+            },
+            exterior(){
+                this.tipo_actividad ='COMISIÓN DE SERVICIOS AL EXTERIOR DEL PAÍS';
+                this.texto1 = 'Para la comisión de servicios desarrollada al exterior del país, la rendición de cuentas no debe exceder los 15 días hábiles después de concluida. Ante el incumplimiento de la rendición o devolución de viáticos no utilizados en el referido plazo, el perceptor de los mismos debe autorizar a la Municipalidad efectúe la retención correspondiente en la Planilla Única de Pagos.'
+                this.texto2 = '(Art. 68° de la Directiva n.° 001-2007-EF/77.15 Directiva de Tesorería, aprobada el 24 de enero de 2007 vigente desde el 25 de enero de 2007 a la actualidad)';
+                this.maximo = 15;
+                this.fechaFinal = '';
+                this.fechaMaximo = '';
+                this.contador = 0;
+            },
+            selectArea(){
+                let me = this;
+                var url = '/Area/selectArea';
+                axios.get(url).then(function(response){//obteniendo todo lo que envia el url, todo los registros 
+                    var respuesta = response.data;
+                    me.arrayArea = respuesta.areas;
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+            },
+            usemoment: function(date){
+                return moment(date).format("DD-MM-YYYY");
+            },
+            savemoment : function(d){
+                if(d == null){  
+                    return '';
+                }else{
+                    return d.split("-").reverse().join("-");
+                }
+            },
+            scrollBehavior: function (to, from, savedPosition) {
+                return savedPosition || { x: 0, y: 0 }
+            },
+            actualizarEncargo(){
+                this.errors = [];
+                let me = this;
+                axios.post("/Viatico/actualizar", {
+                    'idViatico' : this.idViatico,
+                    'idArea' : this.idArea,
+                    'fecha_solicitud' : me.savemoment(this.fechaSolicitud),
+                    'fecha_autorizacion' : me.savemoment(this.fechaAutorizacion),
+                    'fecha_inicio' : me.savemoment(this.fechaInicio),
+                    'fecha_final' : me.savemoment(this.fechaFinal),
+                    'fecha_maximo' : me.savemoment(this.fechaMaximo),
+                    'documento_solicitud' : this.documento_solicitud,
+                    'tipo_actividad' : this.tipo_actividad,
+                    'documento_autorizacion' : this.documento_autorizacion,
+                    'nombre_responsable' : this.nombre_responsable,
+                    'monto_viatico' : this.monto_viatico,
+                }).then(function(response){
+                    me.limpiar();
+                    me.buscar = '';
+                    me.mesBuscar = '';
+                    me.mes = '';
+                    me.anho = '';
+                    me.listarEgreso(1, me.buscar, me.mes, me.anho);
+                    toastr.success('Viatico actualizado.');
+                    me.se_muestra = true
+                })
+                .catch((error)=> this.errors = error.response.data.errors)
+            },
+            registrarEncargo(){
+                this.errors = [];
+                let me = this;
+                axios.post("/Viatico/registrar", {
+                    'idArea' : this.idArea,
+                    'fecha_solicitud' : me.savemoment(this.fechaSolicitud),
+                    'fecha_autorizacion' : me.savemoment(this.fechaAutorizacion),
+                    'fecha_inicio' : me.savemoment(this.fechaInicio),
+                    'fecha_final' : me.savemoment(this.fechaFinal),
+                    'fecha_maximo' : me.savemoment(this.fechaMaximo),
+                    'documento_solicitud' : this.documento_solicitud,
+                    'tipo_actividad' : this.tipo_actividad,
+                    'documento_autorizacion' : this.documento_autorizacion,
+                    'nombre_responsable' : this.nombre_responsable,
+                    'monto_viatico' : this.monto_viatico,
+                }).then(function(response){
+                    me.limpiar();
+                    me.buscar = '';
+                    me.mesBuscar = '';
+                    me.listarEgreso(1, me.buscar, me.mes, me.anho);
+                    toastr.success('Viatico registrado.');
+                    me.se_muestra = true
+                })
+                .catch((error)=> this.errors = error.response.data.errors)
+            }, 
+            cambioEstado(){
+                if(!this.area){
+                    this.idArea = 0;
+                }else{
+                    this.idArea = this.area.idArea;
+                }
+            }, 
+            limpiar(){
+                this.area = '';
+                this.idArea = 0;
+                this.documento_solicitud = '';
+                this.documento_autorizacion = '';
+                this.nombre_responsable = '';
+                this.monto_viatico = 0;
+                this.fechaSolicitud = '';
+                this.fechaAutorizacion = '';
+                this.fechaInicio = '';
+                this.fechaMaximo = '';
+                this.fechaFinal = '';
+                this.cambia = true;
+                this.errors = [];
+            },
+            listarEgreso(page, buscar, mes, anho){
+                let me = this;
+                var url = '/Viatico?page=' + page + '&buscar=' + buscar + '&mes=' + mes + '&anho=' + anho ;
+                axios.get(url).then(function(response){//obteniendo todo lo que envia el url, todo los registros 
+                    var respuesta = response.data;
+                    me.arrayViatico = respuesta.viatico.data;
+                    me.pagination = respuesta.pagination;
+                    me.cargando =  false;
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+            }
+        },
+        mounted() {
+            this.interior();
+            this.selectArea();
+            this.listarEgreso(1, this.buscar, this.mes, this.anho);
+        }
+    }
+</script>
+<style>
+.mx-datepicker{
+    width: 100% !important;
+}
+.card{
+    border-radius: 10px;
+    margin-bottom: 0px;
+}
+.card-header{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    /*background-color: #56E396;*/
+}
+.fa-align-justify:before {
+    color: whitesmoke !important;
+}
+.mod{
+    background-color: #21B2FD;
+    border-color: #21B2FD;
+    color: black;
+    margin-left: 20px;
+    border-radius: 20px !important;
+}
+.mod:hover{
+    background-color: #9E80FF;
+    border-color:#9E80FF;
+    color: white;
+    border-radius: 20px;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+.mods{
+    border-radius : 10px;
+}
+.modle{
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    color: #fff;
+    background-color: #9E80FF !important;
+}
+.border{
+    border-bottom-left-radius: 10px;
+    border-top-left-radius: 10px;
+}
+.btn-border{
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.btns{
+    border-radius: 10px !important;
+}.aux{
+    white-space:normal !important;
+    border-radius: 10px !important;
+}
+.estilo{
+    font-weight: bold;
+}
+.vigente{
+    background-color: #4CAF50;
+    color: #fff;
+}
+.nuevo{
+    border-radius: 20px !important;
+    background-color: #4CAF50 !important;
+    color: #fff;
+}
+.regresar{
+    border-radius: 20px !important;
+}
+.pasado{
+    background-color: #E53935;  
+    color: #fff;
+}
+label{
+    margin-bottom: 0!important;
+}
+.noneBottom{
+    margin-top: 5px;
+}
+@media (max-width: 500px) {
+    .asd{
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+    }
+    .btn1{
+        margin-bottom: 5px;
+    }
+}
+</style>
