@@ -3,7 +3,7 @@
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item mr-auto">
                     <a class="navbar-brand">
-                        <h2 class="brand-text mb-0">Femec</h2>
+                        <h2 class="brand-text mb-0">B'Medic</h2>
                     </a>
                 </li>
                 <li class="nav-item nav-toggle"><a class="nav-link modern-nav-toggle pr-0" data-toggle="collapse"><i class="feather icon-x d-block d-xl-none font-medium-4 success toggle-icon"></i><i class="toggle-icon feather icon-disc font-medium-4 d-none d-xl-block collapse-toggle-icon success" data-ticon="icon-disc"></i></a></li>
@@ -75,7 +75,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class=" nav-item">
+                {{-- <li class=" nav-item">
                     <a>
                         <i class="feather icon-home"></i>
                         <span class="menu-title" data-i18n="Ecommerce">
@@ -93,7 +93,7 @@
                         </li>
                     </ul>
                 </li>
-                
+                 --}}
                 <li class=" nav-item">
                     <a>
                         <i class="feather icon-home"></i>
@@ -130,96 +130,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class=" nav-item">
-                    <a>
-                        <i class="feather icon-home"></i>
-                        <span class="menu-title" data-i18n="Ecommerce">
-                            Categorias
-                        </span>
-                    </a>
-                    <ul class="menu-content">
-                        <li @click="menu=3000">
-                            <a>
-                                <i class="feather icon-circle"></i>
-                                <span class="menu-item" data-i18n="Shop">
-                                    Gestionar Categorias
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class=" nav-item">
-                    <a>
-                        <i class="feather icon-file-plus"></i>
-                        <span class="menu-title" data-i18n="Ecommerce">
-                            Alumnos
-                        </span>
-                    </a>
-                    <ul class="menu-content">
-                        <li @click="menu=100">
-                            <a>
-                                <i class="feather icon-circle"></i>
-                                <span class="menu-item" data-i18n="Shop">
-                                    Gestionar Alumnos
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class=" nav-item">
-                    <a>
-                        <i class="feather icon-home"></i>
-                        <span class="menu-title" data-i18n="Ecommerce">
-                            Cursos
-                        </span>
-                    </a>
-                    <ul class="menu-content">
-                        <li @click="menu=200">
-                            <a>
-                                <i class="feather icon-circle"></i>
-                                <span class="menu-item" data-i18n="Shop">
-                                    Gestionar Cursos
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class=" nav-item">
-                    <a>
-                        <i class="feather icon-home"></i>
-                        <span class="menu-title" data-i18n="Ecommerce">
-                            Lugares
-                        </span>
-                    </a>
-                    <ul class="menu-content">
-                        <li @click="menu=300">
-                            <a>
-                                <i class="feather icon-circle"></i>
-                                <span class="menu-item" data-i18n="Shop">
-                                    Gestionar Lugares
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <li class=" nav-item">
-                    <a>
-                        <i class="feather icon-home"></i>
-                        <span class="menu-title" data-i18n="Ecommerce">
-                            Certificados
-                        </span>
-                    </a>
-                    <ul class="menu-content">
-                        <li @click="menu=400">
-                            <a>
-                                <i class="feather icon-circle"></i>
-                                <span class="menu-item" data-i18n="Shop">
-                                    Gestionar Certificados
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                
                 
             </ul>
         </div>
