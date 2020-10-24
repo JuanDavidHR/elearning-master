@@ -15,7 +15,7 @@ class DetalleMedicamentoController extends Controller
         ->join('laboratorio','detalle_medicamento.idLaboratorio','=','laboratorio.id')
         ->join('botica','detalle_medicamento.idBotica','=','botica.id')
         ->select('detalle_medicamento.id', 'detalle_medicamento.codigo', 'medicamento.nombre as nombre_medicamento','presentacion.nombre as nombre_presentacion',
-        'tipo_medicamento.nombre as nombre_tipo','laboratorio.nombre as nombre_laboratorio','botica.nombre as nombre_botica')
+        'tipo_medicamento.nombre as nombre_tipo','laboratorio.nombre as nombre_laboratorio','botica.nombre as nombre_botica','detalle_medicamento.id')
         ->orderBy('detalle_medicamento.id', 'asc')
         ->paginate(10);
         return [
@@ -34,11 +34,11 @@ class DetalleMedicamentoController extends Controller
         if(!$request->ajax()) return redirect('/');
         DB::beginTransaction();
         try {
-            $detalle_presentaciones = new DetallePresentacion();
-            $detalle_presentaciones->idMedicamento = $request->idMedicamento;
-            $detalle_presentaciones->idPresentacion = $request->idPresentacion;
-            $detalle_presentaciones->codigo = $request->codigo;            
-            $detalle_presentaciones->save();
+            $detalle_medicamento = new DetallePresentacion();
+            $detalle_medicamento->idMedicamento = $request->idMedicamento;
+            $detalle_medicamento->idPresentacion = $request->idPresentacion;
+            $detalle_medicamento->codigo = $request->codigo;            
+            $detalle_medicamento->save();
             DB::commit();
         } catch (\Exception $ex) {
             DB::rollback();
