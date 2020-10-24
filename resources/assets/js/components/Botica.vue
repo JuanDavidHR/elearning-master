@@ -287,7 +287,7 @@ export default {
             })
         },
         cerrarModal(){
-            $('#modaBoticas').modal('hide');
+            $('#modalBoticas').modal('hide');
         },
         initial(){
             this.errors = [];
