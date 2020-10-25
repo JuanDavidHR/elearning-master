@@ -11,8 +11,7 @@ class MedicamentoController extends Controller
 {
     public function index(Request $request){
         if(!$request->ajax()) return redirect('/');
-        $medicamentos = Medicamento::join('tipo_medicamento','medicamento.idTipoMedicamento','=','tipo_medicamento.id')
-        ->select('medicamento.id', 'medicamento.codigo', 'medicamento.nombre','tipo_medicamento.nombre as nombre_tipo')
+        $medicamentos = Medicamento::select('medicamento.id', 'medicamento.codigo', 'medicamento.nombre')
         ->orderBy('medicamento.id', 'asc')
         ->paginate(10);
         return [
@@ -32,7 +31,7 @@ class MedicamentoController extends Controller
         DB::beginTransaction();
         try {
             $medicamento = new Medicamento();
-            $medicamento->idTipoMedicamento = $request->idTipoMedicamento;
+            //$medicamento->idTipoMedicamento = $request->idTipoMedicamento;
             $medicamento->codigo = $request->codigo;
             $medicamento->nombre = $request->nombre;            
             $medicamento->save();
@@ -48,7 +47,7 @@ class MedicamentoController extends Controller
         DB::beginTransaction();
         try {
             $medicamento = Medicamento::findOrFail($request->id);
-            $medicamento->idTipoMedicamento = $request->idTipoMedicamento;
+            //$medicamento->idTipoMedicamento = $request->idTipoMedicamento;
             $medicamento->codigo = $request->codigo;
             $medicamento->nombre = $request->nombre;                      
             $medicamento->save();

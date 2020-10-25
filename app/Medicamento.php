@@ -9,7 +9,7 @@ class Medicamento extends Model
     protected $table = 'medicamento';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'id', 'codigo' ,'nombre','vigencia','idTipoMedicamento'
+        'id', 'codigo' ,'nombre','vigencia'
     ];
     public $timestamps = false;
 }

@@ -140,7 +140,7 @@ import VueNumeric from 'vue-numeric';
 import moment from 'moment';
 export default {
     components : {
-        VueNumeric
+        VueNumeric,
     },
     data(){
         return {

@@ -18,9 +18,6 @@ class CreateMedicamentoTable extends Migration
             $table->string('codigo');
             $table->string('nombre');
             $table->boolean('vigencia')->default(1);
-            $table->integer('idTipoMedicamento')->unsigned();;
-
-            $table->foreign('idTipoMedicamento')->references('id')->on('tipo_medicamento');
         });
     }
 

@@ -16,7 +16,7 @@ class CreateDetallaMedicamentoTable extends Migration
         Schema::create('detalla_medicamento', function (Blueprint $table) {
             $table->increments('id');
             $table->string('codigo');
-            $table->string('registoSanitorio');
+            $table->string('registoSanitario');
             $table->string('precio');
             $table->boolean('vigencia')->default(1);
             $table->integer('idMedicamento')->unsigned();

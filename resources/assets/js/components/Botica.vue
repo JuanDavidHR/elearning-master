@@ -35,6 +35,9 @@
                                             <button type="button" @click="llenarDatos(botica)" class="btn btns btn-warning btn-sm" data-toggle="modal" data-target="#modalBoticas">
                                                 <i style="font-size: 15px;" class="feather  icon-edit"></i>
                                             </button>
+                                            <button type="button" @click="llenarDatos(botica)" class="btn btns btn-success btn-sm" data-toggle="modal" data-target="#modalDetalleMedicamento">
+                                                <i style="font-size: 15px;" class="feather  icon-edit"></i>
+                                            </button>
                                         </td>
                                         <td v-text="botica.codigo"></td>
                                         <td v-text="botica.nombre"></td>
@@ -117,6 +120,74 @@
                     </div>
                 </div>
             </div>
+            <div class="modal fade" tabindex="-1" id="modalDetalleMedicamento" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" v-text="tituloModal"></h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row"> 
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Codigo</p>
+                                    <input type="text" class="form-control" v-model="codigo">
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Medicamento</p>
+                                    <select class="form-control" v-model="idMedicamento">
+                                        <option value="0" disabled>Seleccionar</option>
+                                        <option v-for="medicamentos in arrayMedicamento" :key="medicamentos.id" :value="medicamentos.id" v-text="medicamentos.nombre"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Tipo</p>
+                                    <select class="form-control" v-model="idTipo">
+                                        <option value="0" disabled>Seleccionar</option>
+                                        <option v-for="tipo_medicamentos in arrayTipo" :key="tipo_medicamentos.id" :value="tipo_medicamentos.id" v-text="tipo_medicamentos.nombre"></option>
+                                    </select>
+                                </div> 
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Presentacion</p>
+                                    <select class="form-control" v-model="idPresentacion">
+                                        <option value="0" disabled>Seleccionar</option>
+                                        <option v-for="presentacion in arrayPresentacion" :key="presentacion.id" :value="presentacion.id" v-text="presentacion.nombre"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Botica</p>
+                                    <select class="form-control" v-model="idBotica">
+                                        <option value="0" disabled>Seleccionar</option>
+                                        <option v-for="botica in arrayBotica" :key="botica.id" :value="botica.id" v-text="botica.nombre"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Laboratorio</p>
+                                    <select class="form-control" v-model="idLaboratorio">
+                                        <option value="0" disabled>Seleccionar</option>
+                                        <option v-for="laboratorio in arrayLaboratorio" :key="laboratorio.id" :value="laboratorio.id" v-text="laboratorio.nombre"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Precio</p>
+                                    <input type="text" class="form-control" v-model="precio">
+                                </div> 
+                                <div class="col-md-4 mb-1">
+                                    <p class="p-text">Registro Sanitario</p>
+                                    <input type="text" class="form-control" v-model="registroSanitario">
+                                </div>                                                                                   
+                            </div>                            
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="submit" v-if="tipoAccion == 1"  class="btn btn-success" @click="registrarDetalleMedicamentos()">Registrar</button>
+                            <button type="submit" v-if="tipoAccion == 2" class="btn btn-success"  @click="actualizarDetalleMedicamento()">Actualizar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 </template>
@@ -141,7 +212,29 @@ export default {
             hcierra: '',
             arrayBoticas: [],        
             errors : [],            
+            idBotica2 : '',
+            tituloModal2 : 'Registro de Detalle Presentacion',            
+            codigo : '',
+            arrayDetalleMedicamento: [],
+            arrayPresentacion: [],
+            arrayMedicamento: [],
+            arrayTipo: [],
+            arrayBotica: [],
+            arrayLaboratorio: [],           
+            errors : [],            
+            idDetalleMedicamento : '',
+            idPresentacion : '',
             idBotica : '',
+            idLaboratorio : '',
+            idTipo : '',
+            precio : '',
+            registroSanitario : '',
+            nombre_presentacion: '',
+            nombre_medicamento: '',
+            nombre_tipo: '',
+            nombre_laboratorio: '',
+            nombre_botica: '',
+            idMedicamento : '',
             pagination : {
                 'total'          : 0,
                 'current_page'   : 0,
@@ -293,6 +386,150 @@ export default {
             this.errors = [];
             this.tipoAccion = 1;
             this.tituloModal = 'Registrar Boticas';
+        },
+        llenarDatosMedicamentos(detalla_medicamento){
+            this.tituloModal2 = 'Actualizar  Medicamento';
+            this.idDetalleMedicamento = detalla_medicamento['id'];
+            this.idMedicamento = detalla_medicamento['idMedicamento'];  
+            this.idPresentacion = detalla_medicamento['idPresentacion']; 
+            this.idTipo = detalla_medicamento['idTipo']; 
+            this.idBotica = detalla_medicamento['idBotica'];
+            this.idLaboratorio = detalla_medicamento['idLaboratorio'];            
+            this.tipoAccion = 2;
+            this.codigo = detalla_medicamento['codigo'];
+            this.precio = detalla_medicamento['precio'];
+            this.registroSanitario = detalla_medicamento['registroSanitario'];  
+        },
+        selectPresentacion(){
+            let me=this;
+            var url= '/Presentacion/selectPresentacion' ;
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta= response.data;
+                me.arrayPresentacion = respuesta.presentacion;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        selectMedicamento(){
+            let me=this;
+            var url= '/Medicamento/selectMedicamento' ;
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta= response.data;
+                me.arrayMedicamento = respuesta.medicamento;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        selectBotica(){
+            let me=this;
+            var url= '/Botica/selectBotica' ;
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta= response.data;
+                me.arrayBotica = respuesta.botica;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        selectLaboratorio(){
+            let me=this;
+            var url= '/Laboratorio/selectLaboratorio' ;
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta= response.data;
+                me.arrayLaboratorio = respuesta.laboratorio;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        selectTipo(){
+            let me=this;
+            var url= '/TipoMedicamento/selectTipo' ;
+            axios.get(url).then(function (response) {
+                //console.log(response);
+                var respuesta= response.data;
+                me.arrayTipo = respuesta.tipo_medicamentos;
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        actualizarDetalleMedicamento() {            
+            let me = this;
+            axios
+                .put("/DetalleMedicamento/update", {
+                    idMedicamento: this.idMedicamento,
+                    idPresentacion: this.idPresentacion,
+                    idBotica: this.idBotica,
+                    idTipo: this.idTipo,
+                    idLaboratorio: this.idLaboratorio,
+                    codigo: this.codigo,
+                    precio: this.precio,
+                    registroSanitario: this.registroSanitario,
+                    id: this.idDetalleMedicamento,                   
+                })
+                .then(function(response) {
+                    console.log(response);
+                    toastr.success("Detalle Medicamento Actualizado");
+                    me.cerrarModal();                    
+                    me.obtenerDetalleMedicamento(1);
+                })
+                .catch(error => (this.errors = error.response.data.errors));
+        },
+        obtenerDetalleMedicamento(page){
+            let me = this;
+            var url = '/DetalleMedicamento?page=' + page;
+            axios.get(url).then(function(response){
+                var respuesta = response.data;
+                me.arrayDetalleMedicamento = respuesta.detalle_medicamentos.data;                
+                me.pagination = respuesta.pagination;
+            })
+            .catch(function(error){
+            });
+        },
+        limpiarMedicamento(){
+            this.codigo = '';
+            this.idPresentacion = '';
+            this.idMedicamento = '';                      
+            this.errors = [];
+        },
+        registrarDetalleMedicamentos(){
+            var aux = '';
+            var cod = '';
+            let me = this;
+            axios.post('/DetalleMedicamento/store',{                
+                'codigo' : this.codigo,                                
+                'nombre' : this.nombre,
+                'precio' : this.precio,
+                'registroSanitario' : this.registroSanitario,
+                'idMedicamento' : this.idMedicamento,
+                'idPresentacion' : this.idPresentacion,
+                'idLaboratorio' : this.idLaboratorio,
+                'idBotica' : this.idBotica,
+                'idTipo' : this.idTipo,
+            }).then((response)=>{
+                me.initial();
+                toastr.success('Detalle registrado.');
+                me.obtenerDetalleMedicamento(1);
+                me.cerrarModal();
+                me.limpiar();
+            }).catch((error)=>{
+                this.errors = error.response.data.errors;
+            })
+        },
+        cerrarModalMedicamento(){
+            $('#modalDetalleMedicamento').modal('hide');
+        },
+        initialMedicamento(){
+            this.errors = [];
+            this.tipoAccion = 1;
+            this.tituloModal = 'Registrar Detalle Medicamento';
         },
     },
     mounted() {        

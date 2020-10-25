@@ -7,7 +7,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <h4>Gestión de  Medicamento</h4>
                             <button class="btn btn-success" data-toggle="modal" data-target="#modalMedicamento" @click="initial()">
-                                Nuevo Tipo Medicamento
+                                Nuevo  Medicamento
                             </button>
                         </div>
                     </div>
@@ -21,7 +21,6 @@
                                         <th class="text-center">Opciones</th>
                                         <th class="text-center">Codigo</th>                                        
                                         <th class="text-center">Nombre</th>
-                                        <th class="text-center">Tipo</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -32,8 +31,7 @@
                                             </button>
                                         </td>
                                         <td v-text="medicamento.codigo"></td>
-                                        <td v-text="medicamento.nombre"></td> 
-                                        <td v-text="medicamento.nombre_tipo"></td>                                       
+                                        <td v-text="medicamento.nombre"></td>                                       
                                     </tr>                                
                                 </tbody>
                             </table>
@@ -73,13 +71,13 @@
                                     <p class="p-text">Nombre</p>
                                     <input type="text" class="form-control" v-model="nombre">
                                 </div>
-                                <div class="col-md-4 mb-1">
+                                <!-- <div class="col-md-4 mb-1">
                                     <p class="p-text">Tipo</p>
                                     <select class="form-control" v-model="idTipoMedicamento">
                                         <option value="0" disabled>Seleccionar</option>
                                         <option v-for="tipo_medicamentos in arrayTipoMedicamento" :key="tipo_medicamentos.id" :value="tipo_medicamentos.id" v-text="tipo_medicamentos.nombre"></option>
                                     </select>
-                                </div>                                                                                      
+                                </div>  -->                                                                                     
                             </div>                            
                         </div>
                         <div class="modal-footer">
@@ -179,7 +177,7 @@ export default {
         llenarDatos(medicamento){
             this.tituloModal = 'Actualizar  Medicamento';
             this.idMedicamento = medicamento['id'];
-            this.idTipoMedicamento = medicamento['idTipoMedicamento'];               
+            //this.idTipoMedicamento = medicamento['idTipoMedicamento'];               
             this.tipoAccion = 2;
             this.codigo = medicamento['codigo'];            
             this.nombre = medicamento['nombre'];
@@ -200,7 +198,7 @@ export default {
             let me = this;
             axios
                 .put("/Medicamento/update", {
-                    idTipoMedicamento: this.idTipoMedicamento,
+                    //idTipoMedicamento: this.idTipoMedicamento,
                     codigo: this.codigo,                                        
                     nombre: this.nombre,
                     id: this.idMedicamento,                   
@@ -227,7 +225,7 @@ export default {
         limpiar(){
              this.codigo = '';            
             this.nombre = '';
-            this.idTipoMedicamento = '';                      
+            //this.idTipoMedicamento = '';                      
             this.errors = [];
         },
         registrarMedicamento(){
@@ -237,7 +235,7 @@ export default {
             axios.post('/Medicamento/store',{                
                 'codigo' : this.codigo,                                
                 'nombre' : this.nombre,
-                'idTipoMedicamento' : this.idTipoMedicamento
+                //'idTipoMedicamento' : this.idTipoMedicamento
             }).then((response)=>{
                 me.initial();
                 toastr.success('Medicamento registrado.');
