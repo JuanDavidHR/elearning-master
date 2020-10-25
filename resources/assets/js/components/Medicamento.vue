@@ -64,9 +64,7 @@
                         <div class="modal-body">
                             <div class="row"> 
                                 <div class="col-md-12">
-                                    <p>Ya está de más xd
-                                        
-                                    </p>
+                                    <p>Ya está de más xd</p>
                                 </div>
                                 <div class="col-md-6 mb-1">
                                     <p class="p-text">Codigo</p>
@@ -154,7 +152,7 @@ export default {
         cambiarPagina(page){
             let me = this;
             me.pagination.current_page = page;
-            me.obtenerTipoMedicamentos(page);
+            me.obtenerMedicamentos(page);
         },
         numCero:function(lengthCaracter, total){
             var resta = total-lengthCaracter;
