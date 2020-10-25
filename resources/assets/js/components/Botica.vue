@@ -35,7 +35,7 @@
                                             <button type="button" @click="llenarDatos(botica)" class="btn btns btn-warning btn-sm" data-toggle="modal" data-target="#modalBoticas">
                                                 <i style="font-size: 15px;" class="feather  icon-edit"></i>
                                             </button>
-                                            <button type="button" @click="llenarDatos(botica)" class="btn btns btn-success btn-sm" data-toggle="modal" data-target="#modalDetalleMedicamento">
+                                            <button type="button" @click="llamarDatos(botica)" class="btn btns btn-success btn-sm" data-toggle="modal" data-target="#modalDetalleMedicamento">
                                                 <i style="font-size: 15px;" class="feather  icon-edit"></i>
                                             </button>
                                         </td>
@@ -68,7 +68,7 @@
                 </div>
             </div>
             <div class="modal fade" tabindex="-1" id="modalBoticas" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-md">
+                <div class="modal-dialog modal-xl">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
@@ -78,6 +78,9 @@
                         </div>
                         <div class="modal-body">
                             <div class="row"> 
+                                <div class="col-md-12"> 
+                                    <p>Por Favor no hay validaciones !!!</p>
+                                </div>
                                 <div class="col-md-4 mb-1">
                                     <p class="p-text">Codigo</p>
                                     <input type="text" class="form-control" v-model="codigo">
@@ -121,54 +124,121 @@
                 </div>
             </div>
             <div class="modal fade" tabindex="-1" id="modalDetalleMedicamento" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-md">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h4 class="modal-title" v-text="tituloModal"></h4>
+                            <h4 class="modal-title">Registro de Medicamentos</h4>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <div class="row"> 
+                            <div class="row">
+                                <div class="col-md-6 d-flex">
+                                    <input type="text" class="form-control" @keyup.enter="obtenerDetalleMedicamento(1, idBotica, textoBuscar)" v-model="textoBuscar">
+                                    <button class="btn btn-success" @click.prevent="obtenerDetalleMedicamento(1, idBotica, textoBuscar)">Buscar</button>
+                                </div>
+                                <div class="col-md-3">
+                                    <button class="btn btn-primary" data-toggle="modal" data-target="#modalRegistro" @click="inicializarMedicamento()">
+                                        Agregar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row text-center">
+                                <div class="col-md-12 table-responsive">
+                                    <table class="table table-striped table-sm text-center">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Opciones</th>
+                                                <th class="text-center">Codigo</th>                                        
+                                                <th class="text-center">Medicamento</th>
+                                                <th class="text-center">Tipo</th>
+                                                <th class="text-center">Presentacion</th>
+                                                <th class="text-center">Laboratorio</th>
+                                                <th class="text-center">Precio</th>
+                                                <th class="text-center">Registro Sanitario</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr v-for="detalle in arrayDetalleMedicamento" :key="detalle.id">
+                                                <td>
+                                                    <button type="button" @click="llenarDatosMedicamentos(detalle)" class="btn btns btn-warning btn-sm" data-toggle="modal" data-target="#modalRegistro">
+                                                        <i style="font-size: 15px;" class="feather  icon-edit"></i>
+                                                    </button>
+                                                </td>
+                                                <td v-text="detalle.codigo"></td>
+                                                <td v-text="detalle.nombre_medicamento"></td>                                       
+                                                <td v-text="detalle.nombre_tipo"></td>
+                                                <td v-text="detalle.nombre_presentacion"></td>
+                                                <td v-text="detalle.nombre_laboratorio"></td>
+                                                <td v-text="detalle.precio"></td>
+                                                <td v-text="detalle.registoSanitario"></td>
+                                            </tr>                                
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <nav class="mt-2">
+                                <ul class="pagination mb-0">
+                                    <li class="page-item" v-if="pagination_2.current_page > 1">
+                                        <a class="page-link" href="#" @click.prevent="cambiarPagina2(pagination_2.current_page - 1)">Ant</a>
+                                    </li>
+                                    <li class="page-item" v-for="page in pagesNumber2" :key="page" :class="[page == isActived2 ? 'active' : '']" >
+                                        <a class="page-link" href="#" @click.prevent="cambiarPagina2(page)" v-text="page"></a>
+                                    </li>
+                                    <li class="page-item" v-if="pagination_2.current_page < pagination_2.last_page">
+                                        <a class="page-link" href="#" @click.prevent="cambiarPagina2(pagination_2.current_page + 1)">Sig</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" tabindex="-1" id="modalRegistro" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Detalle de Medicamentos</h4>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p style="color: red;">Por favor no hay validaciones, si hay campos nulos los rellenan con: 'sin información', y si es un campo que se debe de seleccionar registrar uno que diga no se encuentra.</p>
+                                </div>
                                 <div class="col-md-4 mb-1">
                                     <p class="p-text">Codigo</p>
                                     <input type="text" class="form-control" v-model="codigo">
                                 </div>
                                 <div class="col-md-4 mb-1">
                                     <p class="p-text">Medicamento</p>
-                                    <select class="form-control" v-model="idMedicamento">
-                                        <option value="0" disabled>Seleccionar</option>
-                                        <option v-for="medicamentos in arrayMedicamento" :key="medicamentos.id" :value="medicamentos.id" v-text="medicamentos.nombre"></option>
-                                    </select>
+                                    <v-select label="nombre" :options="arrayMedicamento" :clearable="false" v-model="idMedicamento" style="width:100% !important;" >
+                                        <span  slot = "no-options" >No se encontró el Medicamento.</span>
+                                    </v-select>
                                 </div>
                                 <div class="col-md-4 mb-1">
                                     <p class="p-text">Tipo</p>
-                                    <select class="form-control" v-model="idTipo">
-                                        <option value="0" disabled>Seleccionar</option>
-                                        <option v-for="tipo_medicamentos in arrayTipo" :key="tipo_medicamentos.id" :value="tipo_medicamentos.id" v-text="tipo_medicamentos.nombre"></option>
-                                    </select>
+                                    <v-select label="nombre" :options="arrayTipo" :clearable="false" v-model="idTipo" style="width:100% !important;" >
+                                        <span  slot = "no-options" >No se encontró el Medicamento.</span>
+                                    </v-select>
                                 </div> 
                                 <div class="col-md-4 mb-1">
                                     <p class="p-text">Presentacion</p>
-                                    <select class="form-control" v-model="idPresentacion">
-                                        <option value="0" disabled>Seleccionar</option>
-                                        <option v-for="presentacion in arrayPresentacion" :key="presentacion.id" :value="presentacion.id" v-text="presentacion.nombre"></option>
-                                    </select>
-                                </div>
-                                <div class="col-md-4 mb-1">
-                                    <p class="p-text">Botica</p>
-                                    <select class="form-control" v-model="idBotica">
-                                        <option value="0" disabled>Seleccionar</option>
-                                        <option v-for="botica in arrayBotica" :key="botica.id" :value="botica.id" v-text="botica.nombre"></option>
-                                    </select>
+                                    <v-select label="nombre" :options="arrayPresentacion" :clearable="false" v-model="idPresentacion" style="width:100% !important;" >
+                                        <span  slot = "no-options" >No se encontró el Medicamento.</span>
+                                    </v-select>
                                 </div>
                                 <div class="col-md-4 mb-1">
                                     <p class="p-text">Laboratorio</p>
-                                    <select class="form-control" v-model="idLaboratorio">
-                                        <option value="0" disabled>Seleccionar</option>
-                                        <option v-for="laboratorio in arrayLaboratorio" :key="laboratorio.id" :value="laboratorio.id" v-text="laboratorio.nombre"></option>
-                                    </select>
+                                    <v-select label="nombre" :options="arrayLaboratorio" :clearable="false" v-model="idLaboratorio" style="width:100% !important;" >
+                                        <span  slot = "no-options" >No se encontró el Medicamento.</span>
+                                    </v-select>
                                 </div>
                                 <div class="col-md-4 mb-1">
                                     <p class="p-text">Precio</p>
@@ -194,9 +264,12 @@
 <script>
 import VueNumeric from 'vue-numeric';
 import moment from 'moment';
+import vSelect from 'vue-select';
+import 'vue-select/dist/vue-select.css';
 export default {
     components : {
-        VueNumeric
+        VueNumeric,
+        vSelect,
     },
     data(){
         return {
@@ -210,6 +283,7 @@ export default {
             latitud: '',
             hapertura: '',
             hcierra: '',
+            textoBuscar : '',
             arrayBoticas: [],        
             errors : [],            
             idBotica2 : '',
@@ -243,6 +317,14 @@ export default {
                 'from'           : 0,
                 'to'             : 0,
             },
+            pagination_2 : {
+                'total'          : 0,
+                'current_page'   : 0,
+                'per_page'       : 0,
+                'last_page'      : 0,
+                'from'           : 0,
+                'to'             : 0,
+            },
             offset : 3
         }
     },
@@ -269,12 +351,39 @@ export default {
             }
             return pagesArrays;
         },
+        isActived2: function(){
+            return this.pagination_2.current_page;
+        },
+        pagesNumber2: function(){
+            if(!this.pagination_2.to){
+                return [];
+            }
+            var from = this.pagination_2.current_page - this.offset;
+            if(from < 1){
+                from = 1;
+            }
+            var to = from + (this.offset * 2);
+            if(to >= this.pagination_2.last_page){
+                to= this.pagination_2.last_page;
+            }
+            var pagesArrays = [];
+            while(from <= to){
+                pagesArrays.push(from);
+                from++;          
+            }
+            return pagesArrays;
+        },
     },
     methods: {
         cambiarPagina(page){
             let me = this;
             me.pagination.current_page = page;
             me.obtenerBoticas(page);
+        },
+        cambiarPagina2(page){
+            let me = this;
+            me.pagination_2.current_page = page;
+            me.obtenerDetalleMedicamento(page, this.idBotica, this.textoBuscar);
         },
         numCero:function(lengthCaracter, total){
             var resta = total-lengthCaracter;
@@ -288,6 +397,10 @@ export default {
                 }
             }
             return result;
+        },
+        llamarDatos (data){
+            this.idBotica = data['id'];
+            this.obtenerDetalleMedicamento(1, this.idBotica, this.textoBuscar);
         },
         usemoment: function(date){
             return moment(date).format("DD-MM-YYYY");
@@ -387,18 +500,17 @@ export default {
             this.tipoAccion = 1;
             this.tituloModal = 'Registrar Boticas';
         },
-        llenarDatosMedicamentos(detalla_medicamento){
+        llenarDatosMedicamentos(data){
             this.tituloModal2 = 'Actualizar  Medicamento';
-            this.idDetalleMedicamento = detalla_medicamento['id'];
-            this.idMedicamento = detalla_medicamento['idMedicamento'];  
-            this.idPresentacion = detalla_medicamento['idPresentacion']; 
-            this.idTipo = detalla_medicamento['idTipo']; 
-            this.idBotica = detalla_medicamento['idBotica'];
-            this.idLaboratorio = detalla_medicamento['idLaboratorio'];            
+            this.idDetalleMedicamento = data['id'];
+            this.idMedicamento = {'nombre' : data['nombre_medicamento'], 'id': data['id_medicamento']};
+            this.idPresentacion = {'nombre' : data['nombre_presentacion'], 'id': data['id_presentacion']};
+            this.idTipo = {'nombre' : data['nombre_tipo'], 'id': data['id_tipo']};
+            this.idLaboratorio = {'nombre' : data['nombre_laboratorio'], 'id': data['id_laboratorio']};
             this.tipoAccion = 2;
-            this.codigo = detalla_medicamento['codigo'];
-            this.precio = detalla_medicamento['precio'];
-            this.registroSanitario = detalla_medicamento['registroSanitario'];  
+            this.codigo = data['codigo'];
+            this.precio = data['precio'];
+            this.registroSanitario = data['registoSanitario'];  
         },
         selectPresentacion(){
             let me=this;
@@ -462,66 +574,77 @@ export default {
         },
         actualizarDetalleMedicamento() {            
             let me = this;
-            axios
+            if(this.idMedicamento == '' | this.idPresentacion == '' |  this.idLaboratorio == '' | this.idTipo){
+                toastr.error('Revise sus datos');
+            }else{
+                axios
                 .put("/DetalleMedicamento/update", {
-                    idMedicamento: this.idMedicamento,
-                    idPresentacion: this.idPresentacion,
-                    idBotica: this.idBotica,
-                    idTipo: this.idTipo,
-                    idLaboratorio: this.idLaboratorio,
-                    codigo: this.codigo,
-                    precio: this.precio,
-                    registroSanitario: this.registroSanitario,
-                    id: this.idDetalleMedicamento,                   
+                    'codigo' : this.codigo,                                
+                    'nombre' : this.nombre,
+                    'precio' : this.precio,
+                    'registroSanitario' : this.registroSanitario,
+                    'idMedicamento' : this.idMedicamento.id,
+                    'idPresentacion' : this.idPresentacion.id,
+                    'idLaboratorio' : this.idLaboratorio.id,
+                    'idBotica' : this.idBotica,
+                    'idTipo' : this.idTipo.id,
+                    'id': this.idDetalleMedicamento
                 })
                 .then(function(response) {
                     console.log(response);
-                    toastr.success("Detalle Medicamento Actualizado");
-                    me.cerrarModal();                    
-                    me.obtenerDetalleMedicamento(1);
+                    toastr.success('Detalle Actualizado.');
+                    $('#modalRegistro').modal('hide');
+                    me.obtenerDetalleMedicamento(1, me.idBotica, me.textoBuscar);
+                    me.limpiarMedicamento();
                 })
                 .catch(error => (this.errors = error.response.data.errors));
+            }
+
         },
-        obtenerDetalleMedicamento(page){
+        obtenerDetalleMedicamento(page, idBotica, texto){
             let me = this;
-            var url = '/DetalleMedicamento?page=' + page;
+            var url = '/DetalleMedicamento?page=' + page + '&idBotica=' + idBotica + '&texto=' + texto;
             axios.get(url).then(function(response){
                 var respuesta = response.data;
                 me.arrayDetalleMedicamento = respuesta.detalle_medicamentos.data;                
-                me.pagination = respuesta.pagination;
+                me.pagination_2 = respuesta.pagination;
             })
             .catch(function(error){
             });
         },
         limpiarMedicamento(){
-            this.codigo = '';
-            this.idPresentacion = '';
-            this.idMedicamento = '';                      
-            this.errors = [];
+            this.codigo = ''
+            this.nombre = ''
+            this.precio = ''
+            this.registroSanitario = ''
         },
         registrarDetalleMedicamentos(){
             var aux = '';
             var cod = '';
             let me = this;
-            axios.post('/DetalleMedicamento/store',{                
-                'codigo' : this.codigo,                                
-                'nombre' : this.nombre,
-                'precio' : this.precio,
-                'registroSanitario' : this.registroSanitario,
-                'idMedicamento' : this.idMedicamento,
-                'idPresentacion' : this.idPresentacion,
-                'idLaboratorio' : this.idLaboratorio,
-                'idBotica' : this.idBotica,
-                'idTipo' : this.idTipo,
-            }).then((response)=>{
-                me.initial();
-                toastr.success('Detalle registrado.');
-                me.obtenerDetalleMedicamento(1);
-                me.cerrarModal();
-                me.limpiar();
-            }).catch((error)=>{
-                this.errors = error.response.data.errors;
-            })
+            if(this.idMedicamento == '' | this.idPresentacion == '' |  this.idLaboratorio == '' | this.idTipo){
+                toastr.error('Revise sus datos');
+            }else{
+                axios.post('/DetalleMedicamento/store',{                
+                    'codigo' : this.codigo,                                
+                    'nombre' : this.nombre,
+                    'precio' : this.precio,
+                    'registroSanitario' : this.registroSanitario,
+                    'idMedicamento' : this.idMedicamento.id,
+                    'idPresentacion' : this.idPresentacion.id,
+                    'idLaboratorio' : this.idLaboratorio.id,
+                    'idBotica' : this.idBotica,
+                    'idTipo' : this.idTipo.id,
+                }).then((response)=>{
+                    me.initial();
+                    toastr.success('Detalle registrado.');
+                    $('#modalRegistro').modal('hide');
+                    me.obtenerDetalleMedicamento(1, me.idBotica, me.textoBuscar);
+                    me.limpiarMedicamento();
+                }).catch((error)=>{
+                    this.errors = error.response.data.errors;
+                })
+            }
         },
         cerrarModalMedicamento(){
             $('#modalDetalleMedicamento').modal('hide');
@@ -531,14 +654,45 @@ export default {
             this.tipoAccion = 1;
             this.tituloModal = 'Registrar Detalle Medicamento';
         },
+        inicializarMedicamento(){
+            this.limpiarMedicamento();
+        }
     },
     mounted() {        
         this.obtenerBoticas(1);
+        this.selectMedicamento();
+        this.selectPresentacion();
+        this.selectTipo();
+        this.selectLaboratorio();
+    },
+    created() {
+        $(document).on('show.bs.modal', '.modal', function (event) {
+            var zIndex = 1040 + (10 * $('.modal:visible').length);
+            $(this).css('z-index', zIndex);
+            setTimeout(function() {
+                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+            }, 0);
+        });
+        $(document).on('hidden.bs.modal', '.modal', function () {
+            $('.modal:visible').length && $(document.body).addClass('modal-open');
+        });
     },
 }
 </script>
 <style >
     .p-text{
         margin-bottom: 0px !important;
+    }
+    ul#vs3__listbox{
+        max-height: 200px;
+    }
+    ul#vs1__listbox{
+        max-height: 200px;
+    }
+    ul#vs2__listbox{
+        max-height: 200px;
+    }
+    ul#vs4__listbox{
+        max-height: 200px;
     }
 </style>

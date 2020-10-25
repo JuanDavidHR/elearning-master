@@ -62,7 +62,6 @@ class MedicamentoController extends Controller
         if (!$request->ajax()) return redirect('/');
         $medicamento =Medicamento::where('vigencia','=',1)
         ->select('id','nombre')->orderBy('nombre','asc')->get();
-
         return ['medicamento'=>$medicamento];
     }
 }

@@ -53,7 +53,7 @@
                 </div>
             </div>
             <div class="modal fade" tabindex="-1" id="modalLaboratorio" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-md">
+                <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h4 class="modal-title" v-text="tituloModal"></h4>
@@ -63,11 +63,14 @@
                         </div>
                         <div class="modal-body">
                             <div class="row"> 
-                                <div class="col-md-4 mb-1">
+                                <div class="col-md-12">
+                                    <p style="color: red;">*No repetir :3, no hay validaciones, no tengo tiempo!</p>
+                                </div>
+                                <div class="col-md-6 mb-1">
                                     <p class="p-text">Codigo</p>
                                     <input type="text" class="form-control" v-model="codigo">
                                 </div>                     
-                                <div class="col-md-4 mb-1">
+                                <div class="col-md-6 mb-1">
                                     <p class="p-text">Nombre</p>
                                     <input type="text" class="form-control" v-model="nombre">
                                 </div>                                                                                     

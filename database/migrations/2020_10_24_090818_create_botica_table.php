@@ -15,14 +15,14 @@ class CreateBoticaTable extends Migration
     {
         Schema::create('botica', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('codigo');
-            $table->string('nombre');
-            $table->string('direccion');
-            $table->string('telefono');
-            $table->string('longitud');
-            $table->string('latitud');
-            $table->string('hapertura');
-            $table->string('hcierra');
+            $table->string('codigo')->nullable();
+            $table->string('nombre')->nullable();
+            $table->string('direccion')->nullable();
+            $table->string('telefono')->nullable();
+            $table->string('longitud')->nullable();
+            $table->string('latitud')->nullable();
+            $table->string('hapertura')->nullable();
+            $table->string('hcierra')->nullable();
             $table->string('vigencia')->default(1);
         });
     }

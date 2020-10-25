@@ -8,14 +8,29 @@ use App\DetalleMedicamento;
 class DetalleMedicamentoController extends Controller
 {
     public function index(Request $request){
+        $id= $request->idBotica;
+        $texto= $request->texto;
         if(!$request->ajax()) return redirect('/');
         $detalle_medicamentos = DetalleMedicamento::join('medicamento','detalla_medicamento.idMedicamento','=','medicamento.id')
         ->join('presentacion','detalla_medicamento.idPresentacion','=','presentacion.id')
         ->join('tipo_medicamento','detalla_medicamento.idTipo','=','tipo_medicamento.id')
         ->join('laboratorio','detalla_medicamento.idLaboratorio','=','laboratorio.id')
         ->join('botica','detalla_medicamento.idBotica','=','botica.id')
-        ->select('detalla_medicamento.id', 'detalla_medicamento.codigo', 'medicamento.nombre as nombre_medicamento','presentacion.nombre as nombre_presentacion',
-        'tipo_medicamento.nombre as nombre_tipo','laboratorio.nombre as nombre_laboratorio','botica.nombre as nombre_botica','detalla_medicamento.precio','detalla_medicamento.registroSanitario')
+        ->select('detalla_medicamento.id', 
+        'detalla_medicamento.codigo', 
+        'medicamento.nombre as nombre_medicamento',
+        'medicamento.id as id_medicamento',
+        'presentacion.nombre as nombre_presentacion',
+        'presentacion.id as id_presentacion',
+        'tipo_medicamento.nombre as nombre_tipo',
+        'tipo_medicamento.id as id_tipo',
+        'laboratorio.nombre as nombre_laboratorio',
+        'laboratorio.id as id_laboratorio',
+        'botica.nombre as nombre_botica',
+        'detalla_medicamento.precio',
+        'detalla_medicamento.registoSanitario')
+        ->where('botica.id', '=', $id)
+        ->where('medicamento.nombre', 'like', '%'. $texto . '%')
         ->orderBy('detalla_medicamento.id', 'asc')
         ->paginate(10);
         return [
@@ -42,7 +57,7 @@ class DetalleMedicamentoController extends Controller
             $detalle_medicamento->idBotica = $request->idBotica;
             $detalle_medicamento->codigo = $request->codigo;  
             $detalle_medicamento->precio = $request->precio;     
-            $detalle_medicamento->registroSanitario = $request->registroSanitario;         
+            $detalle_medicamento->registoSanitario = $request->registroSanitario;         
             $detalle_medicamento->save();
             DB::commit();
         } catch (\Exception $ex) {
@@ -60,10 +75,9 @@ class DetalleMedicamentoController extends Controller
             $detalle_medicamento->idPresentacion = $request->idPresentacion;
             $detalle_medicamento->idTipo = $request->idTipo;
             $detalle_medicamento->idLaboratorio = $request->idLaboratorio;
-            $detalle_medicamento->idBotica = $request->idBotica;
             $detalle_medicamento->codigo = $request->codigo;  
             $detalle_medicamento->precio = $request->precio;     
-            $detalle_medicamento->registroSanitario = $request->registroSanitario;         
+            $detalle_medicamento->registoSanitario = $request->registroSanitario;         
             $detalle_medicamento->save();;
             DB::commit();
         } catch (\Exception $ex) {

@@ -112,7 +112,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class=" nav-item">
+                <!-- <li class=" nav-item">
                     <a>
                         <i class="feather icon-home"></i>
                         <span class="menu-title" data-i18n="Ecommerce">
@@ -129,7 +129,7 @@
                             </a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
                 
                 
             </ul>

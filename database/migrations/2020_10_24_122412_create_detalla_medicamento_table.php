@@ -15,10 +15,9 @@ class CreateDetallaMedicamentoTable extends Migration
     {
         Schema::create('detalla_medicamento', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('codigo');
-            $table->string('registoSanitario');
-            $table->string('precio');
-            $table->boolean('vigencia')->default(1);
+            $table->string('codigo')->nullable();
+            $table->string('registoSanitario')->nullable();
+            $table->string('precio')->nullable();
             $table->integer('idMedicamento')->unsigned();
             $table->integer('idPresentacion')->unsigned();
             $table->integer('idTipo')->unsigned();
@@ -29,6 +28,7 @@ class CreateDetallaMedicamentoTable extends Migration
             $table->foreign('idTipo')->references('id')->on('tipo_medicamento');
             $table->foreign('idBotica')->references('id')->on('botica');
             $table->foreign('idLaboratorio')->references('id')->on('laboratorio');
+            $table->boolean('vigencia')->default(1);
         });
     }
 
